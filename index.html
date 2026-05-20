@@ -91,10 +91,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   body { font-family: 'Inter', system-ui, sans-serif; color:#111; }
   .hero-bg {
     background:
-      linear-gradient(90deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.25) 55%, rgba(0,0,0,0) 100%), linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,.55) 100%),
+      linear-gradient(90deg, rgba(0,0,0,.78) 0%, rgba(0,0,0,.55) 35%, rgba(0,0,0,.20) 60%, rgba(0,0,0,0) 80%),
+      linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,.55) 100%),
       url('assets/projects/hero.jpg') center/cover no-repeat,
       linear-gradient(135deg, #0B3D26 0%, #0F5132 100%);
   }
+  .text-pop { text-shadow: 0 2px 14px rgba(0,0,0,.65), 0 1px 3px rgba(0,0,0,.5); }
+  .text-pop-sm { text-shadow: 0 1px 8px rgba(0,0,0,.7); }
   .marquee { animation: scroll 35s linear infinite; }
   @keyframes scroll { from { transform: translateX(0);} to { transform: translateX(-50%);} }
   .marquee-wrap:hover .marquee { animation-play-state: paused; }
@@ -176,10 +179,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       <p class="inline-flex items-center gap-2 text-xs font-semibold tracking-wider uppercase bg-white/10 border border-white/20 px-3 py-1.5 rounded-full mb-5">
         <span class="h-1.5 w-1.5 rounded-full bg-amber-300"></span> Pan-India · Turnkey · 3-year maintenance
       </p>
-      <h1 class="text-4xl md:text-6xl font-extrabold leading-[1.05] tracking-tight">
+      <h1 class="text-4xl md:text-6xl font-extrabold leading-[1.05] tracking-tight text-pop">
         Commercial Interior Designers <span class="accent">in India</span>. Built Turnkey, Delivered On&nbsp;Time.
       </h1>
-      <p class="mt-5 text-lg md:text-xl text-white/85 max-w-2xl">
+      <p class="mt-5 text-lg md:text-xl text-white/95 font-medium max-w-2xl text-pop-sm">
         Design, fit-out, furniture and handover under one accountable partner. 250+ offices delivered, 20 lakh+ sq&nbsp;ft executed, 15+ years of pan-India delivery.
       </p>
       <div class="mt-7 flex flex-col sm:flex-row gap-3">
@@ -194,7 +197,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           WhatsApp Us
         </a>
       </div>
-      <p class="mt-4 text-sm text-white/70">Free site visit · Transparent BOQ · No cost for initial design consultation</p>
+      <p class="mt-4 text-sm text-white/90 font-medium text-pop-sm">Free site visit · Transparent BOQ · No cost for initial design consultation</p>
     </div>
     <div class="md:col-span-5 hidden md:block">
       <div class="rounded-2xl bg-white/10 border border-white/20 p-6 backdrop-blur">
