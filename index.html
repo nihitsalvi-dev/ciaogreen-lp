@@ -573,7 +573,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <li>Corporate & Co-working</li>
         <li>Banks & NBFCs</li>
         <li>Retail Stores</li>
-        <li>Schools & Play Zones</li>
+        <li>Hospitals & Healthcare</li>
       </ul>
     </div>
     <div>
@@ -632,4 +632,117 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           <input name="email" type="email" placeholder="Work email (optional)" class="field w-full h-11 rounded-md bg-sand-50 border border-sand-200 px-3">
         </div>
         <div class="grid md:grid-cols-2 gap-3">
-          <select required 
+          <select required name="city" class="field w-full h-11 rounded-md bg-sand-50 border border-sand-200 px-3">
+            <option value="">City</option>
+            <option>Bengaluru</option><option>Mumbai</option><option>Delhi NCR</option>
+            <option>Hyderabad</option><option>Pune</option><option>Chennai</option>
+            <option>Kolkata</option><option>Ahmedabad</option><option>Other</option>
+          </select>
+          <select required name="spaceSize" class="field w-full h-11 rounded-md bg-sand-50 border border-sand-200 px-3">
+            <option value="">Space size</option>
+            <option>&lt; 2,000 sq ft</option>
+            <option>2,000 – 5,000 sq ft</option>
+            <option>5,000 – 15,000 sq ft</option>
+            <option>15,000 – 50,000 sq ft</option>
+            <option>50,000+ sq ft</option>
+          </select>
+        </div>
+        <textarea name="message" rows="3" maxlength="300" placeholder="Tell us briefly about your project (optional)" class="field w-full rounded-md bg-sand-50 border border-sand-200 p-3"></textarea>
+        <label class="flex items-start gap-2 text-xs text-ink-500">
+          <input required type="checkbox" name="consent" class="mt-0.5">
+          <span>I agree to be contacted by Ciao Green about my project. (<a href="privacy.html" class="underline text-brand-700">Privacy Policy</a>)</span>
+        </label>
+        <input type="text" name="company_website" tabindex="-1" autocomplete="off" class="sr-only" aria-hidden="true">
+        <button type="submit" class="w-full h-12 rounded-md bg-brand-700 text-white font-bold hover:bg-brand-800 transition">Get my free quote</button>
+        <p class="text-xs text-center text-ink-400">Free site visit · Transparent BOQ · Reply within 24 hours</p>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Mobile menu
+  document.getElementById('navToggle').addEventListener('click', () => {
+    document.getElementById('mobileMenu').classList.toggle('hidden');
+  });
+
+  // Modal
+  function openLeadModal(source) {
+    const m = document.getElementById('leadModal');
+    m.classList.remove('hidden');
+    m.querySelector('form').dataset.source = 'modal-' + source;
+    document.body.style.overflow = 'hidden';
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({ event: 'lead_modal_open', source });
+  }
+  function closeLeadModal() {
+    document.getElementById('leadModal').classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+  document.getElementById('leadModal').addEventListener('click', e => {
+    if (e.target.id === 'leadModal') closeLeadModal();
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLeadModal(); });
+
+  // Click tracking helper
+  function trackClick(name) {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({ event: 'cta_click', cta: name });
+  }
+
+  // Form submit (hero + modal) POSTs to /api/lead
+  async function handleSubmit(form) {
+    const fd = new FormData(form);
+    if (fd.get('company_website')) return; // honeypot trip
+    const eventId = (crypto.randomUUID ? crypto.randomUUID() : Date.now() + '-' + Math.random());
+    const payload = {
+      fullName: fd.get('fullName'),
+      company: fd.get('company'),
+      phone: fd.get('phone'),
+      email: fd.get('email') || '',
+      city: fd.get('city') || '',
+      spaceSize: fd.get('spaceSize') || '',
+      message: fd.get('message') || '',
+      consent: !!fd.get('consent'),
+      source: form.dataset.source || 'unknown',
+      eventId,
+      pageUrl: location.href,
+      referrer: document.referrer,
+      utm: Object.fromEntries(new URLSearchParams(location.search))
+    };
+    const btn = form.querySelector('button[type=submit]');
+    const original = btn.textContent;
+    btn.textContent = 'Sending…';
+    btn.disabled = true;
+    try {
+      const res = await fetch('/api/lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json().catch(() => ({}));
+      // Fire client-side conversions regardless (deduped with server CAPI via eventId)
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: 'lead_submit',
+        eventId,
+        source: payload.source,
+        city: payload.city,
+        spaceSize: payload.spaceSize,
+        leadId: data.leadId || null
+      });
+      // Redirect
+      location.href = '/thank-you.html?leadId=' + encodeURIComponent(data.leadId || '');
+    } catch (err) {
+      console.error(err);
+      btn.textContent = original;
+      btn.disabled = false;
+      alert('Sorry, we couldn\'t send your request. Please WhatsApp us at +91 86570 06466.');
+    }
+  }
+  document.getElementById('heroForm')?.addEventListener('submit', e => { e.preventDefault(); handleSubmit(e.target); });
+  document.getElementById('modalForm')?.addEventListener('submit', e => { e.preventDefault(); handleSubmit(e.target); });
+</script>
+
+</body>
+</html>
