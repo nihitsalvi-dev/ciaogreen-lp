@@ -1,0 +1,15 @@
+{
+  "name": "ciaogreen-lp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Ciao Green commercial interior LP — static frontend + Vercel serverless lead handler",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'static; nothing to build'",
+    "start": "vercel"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
