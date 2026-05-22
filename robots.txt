@@ -4,4 +4,4 @@ Disallow: /api/
 Disallow: /thank-you
 Disallow: /thank-you.html
 
-Sitemap: https://get.ciaogreen.com/sitemap.xml
+Sitemap: https://quote.ciaogreen.com/sitemap.xm
