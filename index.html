@@ -743,4 +743,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       alert('Sorry, we couldn\'t send your request. Please WhatsApp us at +91 86570 06466.');
     }
   }
-  document.getElementById(
+  document.getElementById('heroForm')?.addEventListener('submit', e => { e.preventDefault(); handleSubmit(e.target); });
+  document.getElementById('modalForm')?.addEventListener('submit', e => { e.preventDefault(); handleSubmit(e.target); });
+</script>
+
+</body>
+</html>
