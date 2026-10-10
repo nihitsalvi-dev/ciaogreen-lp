@@ -188,7 +188,7 @@ async function sendNotificationEmail(payload, leadId, zohoFailed, ip) {
   const to = process.env.NOTIFICATION_EMAIL_TO.split(',').map(s => s.trim()).filter(Boolean);
 
   try {
-    await fetch('https://api.resend.com/emails', {
+    const r = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Authorization': 'Bearer ' + process.env.RESEND_API_KEY,
@@ -202,8 +202,14 @@ async function sendNotificationEmail(payload, leadId, zohoFailed, ip) {
         reply_to: payload.email || undefined
       })
     });
+    if (!r.ok) {
+      console.error('Resend email failed', r.status, await r.text().catch(() => ''));
+      return false;
+    }
+    return true;
   } catch (e) {
     console.error('Resend email failed', e);
+    return false;
   }
 }
 
@@ -258,11 +264,17 @@ export default async function handler(req, res) {
   }
 
   // Fire analytics + ads + notification email in parallel — never penalise ad spend for CRM downtime
-  await Promise.all([
+  const [, , emailSent] = await Promise.all([
     sendGA4Event(payload, eventId),
     sendMetaCAPI(payload, eventId, ip, ua),
     sendNotificationEmail(payload, leadId, zohoFailed, ip)
   ]);
+
+  // If the lead reached neither the CRM nor the inbox, tell the visitor so they can WhatsApp/call instead
+  if (zohoFailed && !emailSent) {
+    console.error('LEAD NOT DELIVERED', JSON.stringify({ name: payload.fullName, company: payload.company, phone: payload.phone }));
+    return res.status(502).json({ ok: false, error: 'Lead could not be delivered' });
+  }
 
   return res.status(200).json({
     ok: true,
