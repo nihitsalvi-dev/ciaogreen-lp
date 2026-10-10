@@ -728,7 +728,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         body: JSON.stringify(payload)
       });
       const data = await res.json().catch(() => ({}));
-      // Fire client-side conversions regardless (deduped with server CAPI via eventId)
+      if (!res.ok || !data.ok) throw new Error(data.error || ('Lead not delivered (' + res.status + ')'));
+      // Count the conversion only once the lead has actually been delivered
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({
         event: 'lead_submit',
@@ -744,7 +745,15 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       console.error(err);
       btn.textContent = original;
       btn.disabled = false;
-      alert('Sorry, we couldn\'t send your request. Please WhatsApp us at +91 86570 06466.');
+      let msg = form.querySelector('.lead-error');
+      if (!msg) {
+        msg = document.createElement('p');
+        msg.className = 'lead-error';
+        msg.setAttribute('role', 'alert');
+        msg.style.cssText = 'margin-top:10px;padding:10px 12px;border-radius:6px;background:#fff4e5;color:#7a3e00;font-size:14px;line-height:1.4;';
+        btn.insertAdjacentElement('afterend', msg);
+      }
+      msg.innerHTML = 'Sorry, we couldn\'t send your request. Please <a href="https://wa.me/918657006466?text=Hi%2C%20I%20need%20a%20quote%20for%20my%20office" target="_blank" rel="noopener" style="text-decoration:underline;font-weight:600;">WhatsApp us</a> or call <a href="tel:+918657006466" style="text-decoration:underline;font-weight:600;">+91 86570 06466</a>.';
     }
   }
   document.getElementById('heroForm')?.addEventListener('submit', e => { e.preventDefault(); handleSubmit(e.target); });
