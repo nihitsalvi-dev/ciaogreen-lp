@@ -25,6 +25,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','GTM-TQ9M33CV');</script>
 
+<!-- Google Analytics (direct tag; GTM's Google tag was not recording page views) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JHR07CQBE8"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-JHR07CQBE8');</script>
+
 <!-- Fire the conversion event when this page loads (idempotent — GTM should de-dupe via eventId in URL) -->
 <script>
   const params = new URLSearchParams(location.search);
@@ -60,4 +64,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   <div class="mt-10 pt-6 border-t border-sand-200 text-sm text-ink-500">
     <p class="font-semibold text-ink-900">While you wait:</p>
     <ul class="mt-2 space-y-1">
-      <li>· Look at our <a href="index.html" class="text-brand-700 underline">recent p
+      <li>· Look at our <a href="index.html#work" class="text-brand-700 underline">recent projects</a></li>
+      <li>· Read our <a href="index.html#faq" class="text-brand-700 underline">answers to common questions</a></li>
+      <li>· See <a href="index.html#process" class="text-brand-700 underline">how we work, step by step</a></li>
+    </ul>
+  </div>
+</main>
+
+</body>
+</html>
