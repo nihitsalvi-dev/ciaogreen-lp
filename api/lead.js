@@ -1,5 +1,5 @@
 // Vercel serverless function — POST /api/lead
-// Handles: validation → Zoho CRM Lead create → GA4 server event → Meta CAPI Lead → fallback Sheet
+// Handles: validation → Zoho CRM Lead create → Meta CAPI Lead → fallback Sheet
 // Deploys automatically on Vercel when this folder is connected to GitHub.
 
 import crypto from 'node:crypto';
@@ -71,29 +71,6 @@ async function createZohoLead(payload) {
     throw new Error('Zoho lead create failed: ' + JSON.stringify(out));
   }
   return out.data[0].details.id;
-}
-
-async function sendGA4Event(payload, eventId) {
-  if (!process.env.GA4_MEASUREMENT_ID || !process.env.GA4_API_SECRET) return;
-  const url = `https://www.google-analytics.com/mp/collect?measurement_id=${process.env.GA4_MEASUREMENT_ID}&api_secret=${process.env.GA4_API_SECRET}`;
-  // Anonymous client_id — use a stable hash of phone for server-side stitching
-  const client_id = crypto.createHash('sha256').update((payload.phone || '') + (payload.email || '')).digest('hex').slice(0, 16) + '.' + Math.floor(Date.now() / 1000);
-  const body = {
-    client_id,
-    events: [{
-      name: 'generate_lead',
-      params: {
-        engagement_time_msec: '100',
-        event_id: eventId,
-        currency: 'INR',
-        value: 1,
-        source: payload.source,
-        city: payload.city,
-        space_size: payload.spaceSize
-      }
-    }]
-  };
-  await fetch(url, { method: 'POST', body: JSON.stringify(body) }).catch(() => {});
 }
 
 async function sendMetaCAPI(payload, eventId, ip, ua) {
@@ -263,9 +240,11 @@ export default async function handler(req, res) {
     await sendFallbackSheet(payload, e);
   }
 
-  // Fire analytics + ads + notification email in parallel — never penalise ad spend for CRM downtime
-  const [, , emailSent] = await Promise.all([
-    sendGA4Event(payload, eventId),
+  // Fire Meta CAPI + notification email in parallel — never penalise ad spend for CRM downtime.
+  // GA4 generate_lead is sent by the browser (GTM), which keeps the visitor's session and
+  // ad source; no server copy is sent, because GA4 cannot de-duplicate
+  // it and its made-up client_id gave every lead a second, source-less event.
+  const [, emailSent] = await Promise.all([
     sendMetaCAPI(payload, eventId, ip, ua),
     sendNotificationEmail(payload, leadId, zohoFailed, ip)
   ]);

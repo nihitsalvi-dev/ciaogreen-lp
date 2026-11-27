@@ -735,7 +735,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.ok) throw new Error(data.error || ('Lead not delivered (' + res.status + ')'));
-      // Count the conversion only once the lead has actually been delivered
+      // Count the conversion only once the lead has actually been delivered.
+      // Redirect only after GTM has fired the lead tags (Ads, GA4, Meta), or after
+      // 1.5 s if GTM is blocked or slow, so the conversion hits are not cut off.
+      const thankYouUrl = '/thank-you.html?leadId=' + encodeURIComponent(data.leadId || '');
+      let redirected = false;
+      const goThankYou = () => { if (!redirected) { redirected = true; location.href = thankYouUrl; } };
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({
         event: 'lead_submit',
@@ -743,10 +748,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         source: payload.source,
         city: payload.city,
         spaceSize: payload.spaceSize,
-        leadId: data.leadId || null
+        leadId: data.leadId || null,
+        eventCallback: goThankYou,
+        eventTimeout: 1500
       });
-      // Redirect
-      location.href = '/thank-you.html?leadId=' + encodeURIComponent(data.leadId || '');
+      setTimeout(goThankYou, 1800);
     } catch (err) {
       console.error(err);
       btn.textContent = original;
